@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedPortal — Dr. Karlygash</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fdf6ee;
+    --blush: #f5c5c0;
+    --rose: #e07c7c;
+    --deep: #3a1f2d;
+    --wine: #7d2e4f;
+    --gold: #c9a84c;
+    --soft: #f9ede8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--deep);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── SCREEN MANAGER ─── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* ════════════════════════════
+     LOGIN SCREEN
+  ════════════════════════════ */
+  #login-screen {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fdf0ea 0%, #fce4e4 50%, #f5d5e8 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #login-screen::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(224,124,124,0.12) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    border-radius: 50%;
+  }
+  #login-screen::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%);
+    bottom: -50px; left: -50px;
+    border-radius: 50%;
+  }
+
+  .login-card {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(224,124,124,0.2);
+    border-radius: 24px;
+    padding: 56px 48px;
+    width: 420px;
+    max-width: 90vw;
+    box-shadow: 0 30px 80px rgba(125,46,79,0.12), 0 8px 24px rgba(125,46,79,0.06);
+    position: relative;
+    z-index: 2;
+    animation: cardIn 0.8s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  @keyframes cardIn {
+    from { opacity:0; transform: translateY(40px) scale(0.96); }
+    to   { opacity:1; transform: translateY(0) scale(1); }
+  }
+
+  .med-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+  .logo-cross {
+    width: 36px; height: 36px;
+    background: var(--wine);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  .logo-cross::before {
+    content: '+';
+    color: white;
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1;
+  }
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--wine);
+    letter-spacing: 0.5px;
+  }
+  .logo-sub {
+    font-size: 11px;
+    color: #aaa;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .greeting {
+    margin-bottom: 28px;
+  }
+  .greeting h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--deep);
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  .greeting p {
+    font-size: 14px;
+    color: #888;
+    line-height: 1.6;
+  }
+
+  .form-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--wine);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .date-hint {
+    font-size: 12px;
+    color: #bbb;
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .date-inputs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .date-inputs input {
+    flex: 1;
+    border: 1.5px solid rgba(224,124,124,0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--deep);
+    background: rgba(255,255,255,0.8);
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  .date-inputs input:focus {
+    border-color: var(--rose);
+    box-shadow: 0 0 0 4px rgba(224,124,124,0.12);
+  }
+  .date-inputs input::placeholder { color: #ccc; font-size: 13px; }
+
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--wine), var(--rose));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    box-shadow: 0 6px 20px rgba(125,46,79,0.3);
+  }
+  .login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(125,46,79,0.4);
+  }
+  .login-btn:active { transform: translateY(0); }
+
+  .error-msg {
+    color: var(--rose);
+    font-size: 13px;
+    margin-top: 12px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: all 0.3s;
+  }
+  .error-msg.show { opacity: 1; transform: translateY(0); }
+
+  /* floating petals */
+  .petal {
+    position: absolute;
+    font-size: 20px;
+    opacity: 0.4;
+    animation: float-petal linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes float-petal {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.4; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ════════════════════════════
+     DASHBOARD SCREEN
+  ════════════════════════════ */
+  #dashboard-screen {
+    flex-direction: column;
+    background: #f7f0eb;
+    min-height: 100vh;
+  }
+
+  .dash-nav {
+    background: white;
+    border-bottom: 1px solid rgba(224,124,124,0.15);
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; }
+  .nav-logo .logo-cross { width: 30px; height: 30px; border-radius: 6px; }
+  .nav-logo .logo-cross::before { font-size: 18px; }
+  .nav-logo span {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: var(--wine);
+  }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .nav-doctor {
+    font-size: 14px;
+    color: var(--deep);
+    font-weight: 500;
+  }
+  .nav-avatar {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--wine), var(--rose));
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .dash-content {
+    padding: 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .dash-header {
+    margin-bottom: 28px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .dash-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--deep);
+    margin-bottom: 6px;
+  }
+  .dash-header p { font-size: 14px; color: #999; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+  .stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px 22px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #aaa; margin-bottom: 8px; }
+  .stat-value { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--deep); }
+  .stat-sub { font-size: 12px; color: #bbb; margin-top: 4px; }
+  .stat-card.highlight { background: linear-gradient(135deg, var(--wine), var(--rose)); }
+  .stat-card.highlight .stat-label,
+  .stat-card.highlight .stat-value,
+  .stat-card.highlight .stat-sub { color: white; }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+
+  .sidebar-col { display: flex; flex-direction: column; gap: 16px; }
+
+  .side-widget {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .widget-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #bbb;
+    margin-bottom: 14px;
+  }
+  .appt-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .appt-item:last-child { border-bottom: none; }
+  .appt-time {
+    font-size: 12px;
+    color: var(--wine);
+    font-weight: 600;
+    min-width: 44px;
+    padding-top: 1px;
+  }
+  .appt-name { font-size: 14px; color: var(--deep); font-weight: 500; }
+  .appt-type { font-size: 12px; color: #aaa; }
+  .appt-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .patients-panel {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--deep);
+  }
+  .panel-tag {
+    font-size: 11px;
+    background: rgba(224,124,124,0.12);
+    color: var(--wine);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .patient-table-head {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1.5fr 1fr 60px;
+    gap: 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #bbb;
+    padding: 0 12px 12px;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  .patient-row {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1.5fr 1fr 60px;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 12px;
+    border-radius: 12px;
+    border-bottom: 1px solid #f9f9f9;
+    transition: background 0.2s;
+    cursor: default;
+  }
+  .patient-row:hover { background: #fdf6ee; }
+
+  /* SPECIAL PATIENT ROW */
+  .patient-row.special {
+    background: linear-gradient(135deg, rgba(245,197,192,0.2), rgba(253,240,234,0.4));
+    border: 1.5px solid rgba(224,124,124,0.3);
+    border-radius: 14px;
+    cursor: pointer;
+    animation: pulse-row 2.5s ease-in-out infinite;
+    position: relative;
+    overflow: visible;
+  }
+  .patient-row.special::before {
+    content: '⚠ URGENT';
+    position: absolute;
+    top: -10px; right: 10px;
+    background: var(--rose);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  @keyframes pulse-row {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(224,124,124,0); }
+    50%       { box-shadow: 0 0 0 6px rgba(224,124,124,0.15); }
+  }
+  .patient-row.special:hover { background: rgba(245,197,192,0.35); }
+
+  .pt-name { display: flex; align-items: center; gap: 10px; }
+  .pt-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .pt-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .pt-avatar.special-av {
+    background: linear-gradient(135deg, var(--wine), var(--rose));
+    color: white;
+    font-size: 16px;
+  }
+  .pt-fullname { font-size: 14px; font-weight: 500; color: var(--deep); }
+  .pt-id { font-size: 11px; color: #bbb; }
+  .pt-condition { font-size: 13px; color: #666; }
+  .pt-condition.urgent { color: var(--rose); font-weight: 500; }
+  .pt-date { font-size: 13px; color: #999; }
+
+  .status-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .status-stable   { background: #e8f5e9; color: #4caf50; }
+  .status-review   { background: #fff3e0; color: #ff9800; }
+  .status-critical { background: #fce4ec; color: var(--rose); }
+
+  .view-btn {
+    background: linear-gradient(135deg, var(--wine), var(--rose));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .view-btn:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(125,46,79,0.3); }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(20px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  /* ════════════════════════════
+     PATIENT PROFILE SCREEN
+  ════════════════════════════ */
+  #profile-screen {
+    flex-direction: column;
+    background: #f7f0eb;
+    min-height: 100vh;
+  }
+
+  .profile-content {
+    padding: 32px;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--wine);
+    cursor: pointer;
+    margin-bottom: 24px;
+    font-weight: 500;
+    transition: gap 0.2s;
+  }
+  .back-btn:hover { gap: 10px; }
+
+  .profile-card {
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(125,46,79,0.1);
+    border: 1px solid rgba(224,124,124,0.15);
+  }
+
+  .profile-hero {
+    background: linear-gradient(135deg, var(--wine) 0%, #c05070 50%, var(--rose) 100%);
+    padding: 40px 40px 32px;
+    display: flex;
+    gap: 28px;
+    align-items: flex-end;
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-hero::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+    top: -100px; right: -50px;
+  }
+
+  .profile-photo {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.4);
+    object-fit: cover;
+    background: rgba(255,255,255,0.2);
+    font-size: 48px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+
+  .profile-id-info { flex: 1; }
+  .profile-id-info h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: white;
+    margin-bottom: 6px;
+  }
+  .profile-id-info .pid {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .profile-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .p-tag {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .p-tag-urgent { background: rgba(255,255,255,0.25); color: white; border: 1px solid rgba(255,255,255,0.3); }
+  .p-tag-dept   { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); }
+
+  .profile-body { padding: 36px 40px; }
+
+  .vitals-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .vital {
+    text-align: center;
+    padding: 18px 12px;
+    background: var(--soft);
+    border-radius: 14px;
+    border: 1px solid rgba(224,124,124,0.15);
+  }
+  .vital-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    color: var(--wine);
+    margin-bottom: 4px;
+  }
+  .vital-name { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+
+  .diagnosis-section { margin-bottom: 32px; }
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #bbb;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #f0f0f0;
+  }
+
+  .diagnosis-box {
+    background: linear-gradient(135deg, rgba(245,197,192,0.18), rgba(253,240,234,0.3));
+    border: 1.5px solid rgba(224,124,124,0.25);
+    border-radius: 16px;
+    padding: 24px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .diagnosis-box::before {
+    content: '♥';
+    position: absolute;
+    font-size: 80px;
+    right: 20px;
+    top: -10px;
+    color: rgba(224,124,124,0.08);
+    line-height: 1;
+  }
+  .diag-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--wine);
+    margin-bottom: 10px;
+  }
+  .diag-code {
+    display: inline-block;
+    font-size: 11px;
+    background: rgba(125,46,79,0.12);
+    color: var(--wine);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+  .diag-desc {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.8;
+  }
+  .diag-desc strong { color: var(--wine); }
+
+  .prescription-box {
+    background: white;
+    border: 1.5px dashed rgba(224,124,124,0.4);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .rx-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .rx-symbol {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--wine);
+    font-style: italic;
+  }
+  .rx-title { font-size: 16px; font-weight: 600; color: var(--deep); }
+  .rx-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px dashed #f5e8e8;
+    align-items: center;
+  }
+  .rx-item:last-child { border-bottom: none; }
+  .rx-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--rose); flex-shrink: 0; margin-top: 2px; }
+  .rx-text { font-size: 14px; color: #555; line-height: 1.5; }
+  .rx-text strong { color: var(--deep); }
+
+  /* Date picker section */
+  .date-section { margin-bottom: 8px; }
+  .date-section p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .date-picker-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  .date-picker-group { flex: 1; min-width: 180px; }
+  .date-picker-group label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--wine);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .date-picker-group input[type="date"] {
+    width: 100%;
+    border: 1.5px solid rgba(224,124,124,0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--deep);
+    background: white;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .date-picker-group input[type="date"]:focus {
+    border-color: var(--rose);
+    box-shadow: 0 0 0 4px rgba(224,124,124,0.1);
+  }
+  .date-picker-group textarea {
+    width: 100%;
+    border: 1.5px solid rgba(224,124,124,0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--deep);
+    background: white;
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color 0.2s;
+  }
+  .date-picker-group textarea:focus {
+    border-color: var(--rose);
+    box-shadow: 0 0 0 4px rgba(224,124,124,0.1);
+  }
+
+  .submit-date-btn {
+    padding: 13px 28px;
+    background: linear-gradient(135deg, var(--wine), var(--rose));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(125,46,79,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+  }
+  .submit-date-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(125,46,79,0.4); }
+
+  /* ════════════════════════════
+     SENDING OVERLAY
+  ════════════════════════════ */
+  #sending-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(253,246,238,0.95);
+    z-index: 100;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+  }
+  #sending-overlay.active { display: flex; }
+  .sending-spinner {
+    width: 48px; height: 48px;
+    border: 3px solid rgba(224,124,124,0.2);
+    border-top: 3px solid var(--rose);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #sending-overlay p { font-size: 16px; color: var(--wine); font-weight: 500; }
+
+  /* ════════════════════════════
+     BLACK SCREEN + HEART
+  ════════════════════════════ */
+  #heart-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    min-height: 100vh;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  #heart-screen.active { display: flex; }
+
+  .main-heart {
+    font-size: 40px;
+    animation: heartAppear 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    filter: drop-shadow(0 0 20px rgba(224,100,100,0.5));
+    cursor: pointer;
+    transition: filter 0.2s;
+    user-select: none;
+    display: block;
+    text-align: center;
+  }
+  .main-heart:hover { filter: drop-shadow(0 0 30px rgba(255,100,100,0.8)); }
+  @keyframes heartAppear {
+    from { opacity: 0; transform: scale(0); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .heart-hint {
+    color: rgba(255,255,255,0.25);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 20px;
+    animation: fadeIn 2s 1.5s ease both;
+  }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  .heart-particle {
+    position: absolute;
+    pointer-events: none;
+    animation: particle-burst linear forwards;
+  }
+  @keyframes particle-burst {
+    0%   { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.3); }
+  }
+
+  /* ════════════════════════════
+     REASONS SCREEN
+  ════════════════════════════ */
+  #reasons-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 50% 0%, #7d2e4f 0%, #3a1f2d 50%, #1a0d18 100%);
+    padding: 60px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  #reasons-screen.active { display: flex; }
+  #reasons-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e07c7c' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .reasons-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    color: rgba(245,197,192,0.5);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .reasons-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 54px);
+    color: white;
+    text-align: center;
+    margin-bottom: 48px;
+    line-height: 1.2;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .reasons-heading span { color: var(--blush); font-style: italic; }
+
+  .reasons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    max-width: 960px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+
+  .reason-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(245,197,192,0.15);
+    border-radius: 16px;
+    padding: 22px 24px;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+    backdrop-filter: blur(10px);
+  }
+  .reason-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reason-card:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(245,197,192,0.35);
+    transform: translateY(-3px);
+  }
+  .reason-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    color: rgba(245,197,192,0.5);
+    margin-bottom: 8px;
+    font-style: italic;
+  }
+  .reason-text {
+    font-size: 15px;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.6;
+  }
+  .reason-text strong { color: var(--blush); }
+
+  .float-hearts {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .fh {
+    position: absolute;
+    bottom: -40px;
+    font-size: 24px;
+    opacity: 0;
+    animation: floatUp linear forwards;
+  }
+  @keyframes floatUp {
+    0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.3; }
+    100% { opacity: 0; transform: translateY(-110vh) rotate(30deg); }
+  }
+
+  .reasons-footer {
+    margin-top: 48px;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: rgba(255,255,255,0.7);
+    font-style: italic;
+    animation: fadeUp 0.8s 1s ease both;
+    position: relative;
+    z-index: 1;
+  }
+  .reasons-footer span { color: var(--blush); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 700px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .main-grid { grid-template-columns: 1fr; }
+    .vitals-row { grid-template-columns: repeat(2, 1fr); }
+    .profile-hero { flex-direction: column; align-items: flex-start; }
+    .patient-table-head,
+    .patient-row { grid-template-columns: 2fr 1fr 80px; }
+    .patient-row > *:nth-child(3),
+    .patient-row > *:nth-child(4),
+    .patient-table-head > *:nth-child(3),
+    .patient-table-head > *:nth-child(4) { display: none; }
+    .date-picker-row { flex-direction: column; }
+    .dash-content, .profile-content { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════ LOGIN SCREEN ════════════ -->
+<div id="login-screen" class="screen active">
+
+  <!-- floating petals -->
+  <div class="petal" style="left:10%;animation-duration:12s;animation-delay:0s;top:0">🌸</div>
+  <div class="petal" style="left:30%;animation-duration:15s;animation-delay:3s;top:0">🌺</div>
+  <div class="petal" style="left:55%;animation-duration:11s;animation-delay:1.5s;top:0">💮</div>
+  <div class="petal" style="left:75%;animation-duration:13s;animation-delay:4s;top:0">🌸</div>
+  <div class="petal" style="left:88%;animation-duration:14s;animation-delay:2s;top:0">🌺</div>
+  <div class="petal" style="left:45%;animation-duration:16s;animation-delay:6s;top:0">🌸</div>
+
+  <div class="login-card">
+    <div class="med-logo">
+      <div class="logo-cross"></div>
+      <div>
+        <div class="logo-text">MedPortal</div>
+        <div class="logo-sub">Clinical Dashboard</div>
+      </div>
+    </div>
+
+    <div class="greeting">
+      <h1>Good morning,<br>Dr. Karlygash 🩺</h1>
+      <p>Welcome back. Please verify your identity<br>to access your patient dashboard.</p>
+    </div>
+
+    <label class="form-label">Security Access Code</label>
+    <p class="date-hint">Enter the date of a very special occasion (DD · MM · YYYY)</p>
+
+    <div class="date-inputs">
+      <input type="text" id="d-day"   placeholder="DD"   maxlength="2" inputmode="numeric">
+      <input type="text" id="d-month" placeholder="MM"   maxlength="2" inputmode="numeric">
+      <input type="text" id="d-year"  placeholder="YYYY" maxlength="4" inputmode="numeric">
+    </div>
+
+    <button class="login-btn" onclick="checkLogin()">Access Dashboard →</button>
+    <div class="error-msg" id="login-error">Incorrect date. Think of something special... 💭</div>
+  </div>
+</div>
+
+<!-- ════════════ DASHBOARD SCREEN ════════════ -->
+<div id="dashboard-screen" class="screen">
+  <nav class="dash-nav">
+    <div class="nav-logo">
+      <div class="logo-cross"></div>
+      <span>MedPortal</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-doctor">Dr. Karlygash</span>
+      <div class="nav-avatar">K</div>
+    </div>
+  </nav>
+
+  <div class="dash-content">
+    <div class="dash-header">
+      <h2>Today's Overview</h2>
+      <p>Saturday, February 14, 2026 — Cardiology & General Ward</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card highlight">
+        <div class="stat-label">Active Patients</div>
+        <div class="stat-value">12</div>
+        <div class="stat-sub">+2 since yesterday</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Appointments</div>
+        <div class="stat-value">7</div>
+        <div class="stat-sub">3 remaining today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Lab Results</div>
+        <div class="stat-value">4</div>
+        <div class="stat-sub">Awaiting review</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Urgent Cases</div>
+        <div class="stat-value" style="color:var(--rose)">1</div>
+        <div class="stat-sub" style="color:var(--rose)">Needs attention !</div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <!-- Sidebar -->
+      <div class="sidebar-col">
+        <div class="side-widget">
+          <div class="widget-title">Today's Schedule</div>
+          <div class="appt-item">
+            <div class="appt-dot" style="background:#4caf50"></div>
+            <div>
+              <div class="appt-time">09:00</div>
+              <div class="appt-name">Aibek Seitkali</div>
+              <div class="appt-type">Follow-up · Hypertension</div>
+            </div>
+          </div>
+          <div class="appt-item">
+            <div class="appt-dot" style="background:#ff9800"></div>
+            <div>
+              <div class="appt-time">10:30</div>
+              <div class="appt-name">Madina Akhmetova</div>
+              <div class="appt-type">Consultation · Chest Pain</div>
+            </div>
+          </div>
+          <div class="appt-item">
+            <div class="appt-dot" style="background:var(--rose)"></div>
+            <div>
+              <div class="appt-time">13:00</div>
+              <div class="appt-name">Daniyar Mukanov</div>
+              <div class="appt-type">URGENT · Cardiac Review</div>
+            </div>
+          </div>
+          <div class="appt-item">
+            <div class="appt-dot" style="background:#4caf50"></div>
+            <div>
+              <div class="appt-time">15:30</div>
+              <div class="appt-name">Zulfiya Bekova</div>
+              <div class="appt-type">Check-up · Routine</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-widget">
+          <div class="widget-title">Ward Alerts</div>
+          <div style="font-size:13px;color:#666;line-height:1.7">
+            🔴 <strong>Bed 4</strong> — Patient critical, pending ECG<br>
+            🟡 <strong>Bed 7</strong> — Lab results delayed<br>
+            🟢 <strong>Bed 11</strong> — Ready for discharge<br>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main patients panel -->
+      <div class="patients-panel">
+        <div class="panel-header">
+          <div class="panel-title">Patient List</div>
+          <div class="panel-tag">12 patients</div>
+        </div>
+
+        <div class="patient-table-head">
+          <span>Patient</span>
+          <span>Condition</span>
+          <span>Last Visit</span>
+          <span>Status</span>
+          <span></span>
+        </div>
+
+        <!-- Regular rows -->
+        <div class="patient-row">
+          <div class="pt-name">
+            <div class="pt-avatar">👴</div>
+            <div><div class="pt-fullname">Aibek Seitkali</div><div class="pt-id">#PT-0041</div></div>
+          </div>
+          <div class="pt-condition">Hypertension</div>
+          <div class="pt-date">Feb 10, 2026</div>
+          <div><span class="status-badge status-stable">Stable</span></div>
+          <div><button class="view-btn">View</button></div>
+        </div>
+
+        <div class="patient-row">
+          <div class="pt-name">
+            <div class="pt-avatar">👩</div>
+            <div><div class="pt-fullname">Madina Akhmetova</div><div class="pt-id">#PT-0038</div></div>
+          </div>
+          <div class="pt-condition">Chest Pain</div>
+          <div class="pt-date">Feb 12, 2026</div>
+          <div><span class="status-badge status-review">Review</span></div>
+          <div><button class="view-btn">View</button></div>
+        </div>
+
+        <div class="patient-row">
+          <div class="pt-name">
+            <div class="pt-avatar">👦</div>
+            <div><div class="pt-fullname">Timur Dzhaksybekov</div><div class="pt-id">#PT-0055</div></div>
+          </div>
+          <div class="pt-condition">Arrhythmia</div>
+          <div class="pt-date">Feb 8, 2026</div>
+          <div><span class="status-badge status-stable">Stable</span></div>
+          <div><button class="view-btn">View</button></div>
+        </div>
+
+        <div class="patient-row">
+          <div class="pt-name">
+            <div class="pt-avatar">👵</div>
+            <div><div class="pt-fullname">Zulfiya Bekova</div><div class="pt-id">#PT-0022</div></div>
+          </div>
+          <div class="pt-condition">Diabetes</div>
+          <div class="pt-date">Jan 30, 2026</div>
+          <div><span class="status-badge status-stable">Stable</span></div>
+          <div><button class="view-btn">View</button></div>
+        </div>
+
+        <!-- ❤️ SPECIAL PATIENT -->
+        <div class="patient-row special" onclick="openProfile()" title="Click to view full record">
+          <div class="pt-name">
+            <div class="pt-avatar special-av">💙</div>
+            <div><div class="pt-fullname">Nurali Yersakanov</div><div class="pt-id">#PT-0069 · PRIORITY</div></div>
+          </div>
+          <div class="pt-condition urgent">Cardiac Itch Syndrome</div>
+          <div class="pt-date">Today</div>
+          <div><span class="status-badge status-critical">Critical</span></div>
+          <div><button class="view-btn">View</button></div>
+        </div>
+
+        <div class="patient-row">
+          <div class="pt-name">
+            <div class="pt-avatar">🧑</div>
+            <div><div class="pt-fullname">Ruslan Ospanov</div><div class="pt-id">#PT-0047</div></div>
+          </div>
+          <div class="pt-condition">Post-op Recovery</div>
+          <div class="pt-date">Feb 13, 2026</div>
+          <div><span class="status-badge status-review">Review</span></div>
+          <div><button class="view-btn">View</button></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ PATIENT PROFILE SCREEN ════════════ -->
+<div id="profile-screen" class="screen">
+  <nav class="dash-nav">
+    <div class="nav-logo">
+      <div class="logo-cross"></div>
+      <span>MedPortal</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-doctor">Dr. Karlygash</span>
+      <div class="nav-avatar">K</div>
+    </div>
+  </nav>
+
+  <div class="profile-content">
+    <div class="back-btn" onclick="goBack()">← Back to Dashboard</div>
+
+    <div class="profile-card">
+      <!-- Hero -->
+      <div class="profile-hero">
+        <div class="profile-photo">
+          <img id="patient-photo"
+               src="https://i.ibb.co.com/1tSfbKL0/unnamed-1.jpg"
+               alt="Nurali"
+               onerror="this.parentElement.innerHTML='💙'"
+          >
+        </div>
+        <div class="profile-id-info">
+          <div class="pid">PATIENT RECORD  #PT-0069</div>
+          <h2>Nurali Yersakanov</h2>
+          <div class="profile-tags">
+            <span class="p-tag p-tag-urgent">⚠ URGENT</span>
+            <span class="p-tag p-tag-dept">Cardiology</span>
+            <span class="p-tag p-tag-dept">Ward B</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="profile-body">
+
+        <div class="vitals-row">
+          <div class="vital"><div class="vital-val">♥ 999</div><div class="vital-name">BPM for you</div></div>
+          <div class="vital"><div class="vital-val">37.0°</div><div class="vital-name">Temperature</div></div>
+          <div class="vital"><div class="vital-val">∞</div><div class="vital-name">Love Level</div></div>
+          <div class="vital"><div class="vital-val" style="color:var(--rose)">ITCHY</div><div class="vital-name">Heart Status</div></div>
+        </div>
+
+        <!-- Diagnosis -->
+        <div class="diagnosis-section">
+          <div class="section-label">Primary Diagnosis</div>
+          <div class="diagnosis-box">
+            <div class="diag-code">ICD-10: I99.LOVE</div>
+            <div class="diag-title">Chronic Cardiac Itch Syndrome</div>
+            <div class="diag-desc">
+              Patient presents with a persistent, unrelenting <strong>itching sensation deep within the cardiac muscle</strong>, first documented on <strong>6 August 2023</strong>. The condition has been progressive and appears entirely resistant to conventional treatment.<br><br>
+              Clinical evaluation reveals the itch is triggered exclusively by <strong>proximity to Dr. Karlygash</strong>, her voice, her laugh, and the thought of her in general. The patient reports that his heart does a complicated little flip whenever she smiles at him, and doesn't stop itching until she's nearby again.<br><br>
+              Prognosis: <strong>Permanent and delightful.</strong> No cure sought.
+            </div>
+          </div>
+        </div>
+
+        <!-- Prescription -->
+        <div class="section-label">Recommended Treatment Plan</div>
+        <div class="prescription-box">
+          <div class="rx-header">
+            <div class="rx-symbol">℞</div>
+            <div class="rx-title">Prescribed by: patient's own hopeful heart</div>
+          </div>
+          <div class="rx-item">
+            <div class="rx-dot"></div>
+            <div class="rx-text"><strong>Date Night × 1</strong> — A single evening out together; frequency to be determined by prescribing physician (Dr. Karlygash).</div>
+          </div>
+          <div class="rx-item">
+            <div class="rx-dot"></div>
+            <div class="rx-text"><strong>Quality Time</strong> — Minimum recommended dose: enough time for patient to feel that warm, quiet happiness he only gets around you.</div>
+          </div>
+          <div class="rx-item">
+            <div class="rx-dot"></div>
+            <div class="rx-text"><strong>Your presence</strong> — The only substance proven to relieve the cardiac itch. Entirely non-substitutable.</div>
+          </div>
+        </div>
+
+        <!-- Date Picker -->
+        <div class="section-label">Schedule Treatment Date</div>
+        <div class="date-section">
+          <p>
+            Doctor Karlygash, the patient would be very grateful if you could find a free evening for him.
+            Please select the date that suits you best — he'll be ready whenever you are 🌹
+          </p>
+          <div class="date-picker-row">
+            <div class="date-picker-group">
+              <label>Preferred Date</label>
+              <input type="date" id="chosen-date" min="2026-02-14">
+            </div>
+            <div class="date-picker-group" style="flex:2">
+              <label>Your message (optional)</label>
+              <textarea id="chosen-note" placeholder="e.g. 'Saturday evening works, pick me up at 7' 💬"></textarea>
+            </div>
+            <button class="submit-date-btn" onclick="submitDate()">Send to patient 💌</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ SENDING OVERLAY ════════════ -->
+<div id="sending-overlay">
+  <div class="sending-spinner"></div>
+  <p>Sending your message to the patient... 💌</p>
+</div>
+
+<!-- ════════════ HEART SCREEN ════════════ -->
+<div id="heart-screen" class="screen" onclick="growHeart()">
+  <span id="big-heart" class="main-heart">❤️</span>
+  <div class="heart-hint">tap the heart</div>
+</div>
+
+<!-- ════════════ REASONS SCREEN ════════════ -->
+<div id="reasons-screen" class="screen">
+  <div class="float-hearts" id="float-hearts"></div>
+
+  <div class="reasons-title">a love letter in 14 parts</div>
+  <h1 class="reasons-heading">14 Reasons Why I<br><span>Love You</span>, Karlygash</h1>
+
+  <div class="reasons-grid" id="reasons-grid"></div>
+
+  <div class="reasons-footer">
+    Happy Valentine's Day, <span>my doctor 🩺❤️</span>
+  </div>
+</div>
+
+<script>
+/* ════════════════════
+   LOGIN
+════════════════════ */
+const inputs = ['d-day','d-month','d-year'];
+inputs.forEach((id,i) => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => {
+    el.value = el.value.replace(/\D/g,'');
+    if (el.value.length === el.maxLength && i < inputs.length-1)
+      document.getElementById(inputs[i+1]).focus();
+  });
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkLogin();
+  });
+});
+
+function checkLogin() {
+  const d = document.getElementById('d-day').value.padStart(2,'0');
+  const m = document.getElementById('d-month').value.padStart(2,'0');
+  const y = document.getElementById('d-year').value;
+  if (d === '06' && m === '08' && y === '2023') {
+    document.getElementById('login-screen').style.transition = 'opacity 0.6s';
+    document.getElementById('login-screen').style.opacity = '0';
+    setTimeout(() => {
+      showScreen('dashboard-screen');
+    }, 600);
+  } else {
+    const err = document.getElementById('login-error');
+    err.classList.add('show');
+    document.getElementById('d-day').style.borderColor = 'var(--rose)';
+    document.getElementById('d-month').style.borderColor = 'var(--rose)';
+    document.getElementById('d-year').style.borderColor = 'var(--rose)';
+    setTimeout(() => {
+      err.classList.remove('show');
+      ['d-day','d-month','d-year'].forEach(id => {
+        document.getElementById(id).style.borderColor = '';
+      });
+    }, 3000);
+  }
+}
+
+/* ════════════════════
+   SCREEN MANAGER
+════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const s = document.getElementById(id);
+  s.classList.add('active');
+  s.style.opacity = '0';
+  requestAnimationFrame(() => {
+    s.style.transition = 'opacity 0.6s';
+    s.style.opacity = '1';
+  });
+}
+
+function openProfile() { showScreen('profile-screen'); }
+function goBack()      { showScreen('dashboard-screen'); }
+
+/* ════════════════════
+   DATE SUBMISSION
+════════════════════ */
+const WEBHOOK = 'https://discord.com/api/webhooks/997582723541635172/HvE49-FowTVsqPOy39FgbK3a-cfZLqIU7CJt5UGekmZB5LBkBlTHdTh5ZcpyHwj2wQhC';
+
+async function submitDate() {
+  const dateVal = document.getElementById('chosen-date').value;
+  const note = document.getElementById('chosen-note').value.trim();
+
+  if (!dateVal) {
+    alert('Please choose a date first 📅');
+    return;
+  }
+
+  const dateFormatted = new Date(dateVal).toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  // Show sending overlay
+  document.getElementById('sending-overlay').classList.add('active');
+
+  const payload = {
+    username: "Dr. Karlygash 🩺",
+    avatar_url: "https://i.imgur.com/uPFhMaA.jpeg",
+    embeds: [{
+      title: "💌 Date Night Confirmation",
+      description: `Dr. Karlygash has reviewed your case and approved a treatment session!`,
+      color: 0xe07c7c,
+      fields: [
+        { name: "📅 Selected Date", value: dateFormatted, inline: false },
+        { name: "💬 Her Message", value: note || "*(no message)*", inline: false },
+        { name: "🩺 Diagnosis", value: "Chronic Cardiac Itch Syndrome (ICD-10: I99.LOVE)", inline: false }
+      ],
+      footer: { text: "MedPortal Clinical Dashboard • Happy Valentine's Day 💕" },
+      timestamp: new Date().toISOString()
+    }]
+  };
+
+  try {
+    await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {
+    console.log('Webhook sent (or tried)', e);
+  }
+
+  setTimeout(() => {
+    document.getElementById('sending-overlay').classList.remove('active');
+    startBlackScreen();
+  }, 2000);
+}
+
+/* ════════════════════
+   BLACK → HEART SCREEN
+════════════════════ */
+function startBlackScreen() {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+
+  const hs = document.getElementById('heart-screen');
+  hs.style.display = 'flex';
+  hs.style.opacity = '0';
+
+  setTimeout(() => {
+    hs.style.transition = 'opacity 1s';
+    hs.style.opacity = '1';
+    hs.classList.add('active');
+  }, 100);
+}
+
+let heartSize = 40;
+let clickCount = 0;
+let shaking = false;
+
+function growHeart() {
+  if (shaking) return;
+  clickCount++;
+  heartSize = Math.min(heartSize + 22, 260);
+
+  const heart = document.getElementById('big-heart');
+  heart.style.fontSize = heartSize + 'px';
+  heart.style.filter = `drop-shadow(0 0 ${heartSize/4}px rgba(255,80,80,0.7))`;
+
+  // Particle burst
+  spawnParticles();
+
+  if (heartSize >= 260) {
+    shaking = true;
+    heart.style.animation = 'none';
+    void heart.offsetWidth;
+    heart.style.animation = 'heartShake 0.08s linear 12';
+    heart.style.cssText += `
+      animation: heartShake 0.08s linear 12;
+    `;
+
+    // Add shake keyframe dynamically
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+      @keyframes heartShake {
+        0%,100%{ transform: translate(0,0) rotate(0deg); }
+        20%    { transform: translate(-8px, 4px) rotate(-5deg); }
+        40%    { transform: translate(8px, -4px) rotate(5deg); }
+        60%    { transform: translate(-6px, 6px) rotate(-3deg); }
+        80%    { transform: translate(6px, -6px) rotate(3deg); }
+      }
+      @keyframes explode {
+        0%   { opacity:1; transform: scale(1); }
+        50%  { opacity:1; transform: scale(1.4); filter: drop-shadow(0 0 60px rgba(255,80,80,1)); }
+        100% { opacity:0; transform: scale(0.2); }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+    heart.style.animation = 'heartShake 0.08s linear 12';
+
+    setTimeout(() => {
+      massParticles();
+      heart.style.animation = 'explode 0.6s cubic-bezier(0.36,0.07,0.19,0.97) forwards';
+      setTimeout(() => showReasons(), 800);
+    }, 960);
+  }
+}
+
+function spawnParticles() {
+  const screen = document.getElementById('heart-screen');
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  for (let i = 0; i < 6; i++) {
+    const p = document.createElement('div');
+    p.className = 'heart-particle';
+    p.textContent = ['❤️','💕','💗','💓','💖'][Math.floor(Math.random()*5)];
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 80 + Math.random() * 120;
+    p.style.cssText = `
+      left: ${cx}px; top: ${cy}px;
+      font-size: ${10 + Math.random()*16}px;
+      --tx: ${Math.cos(angle)*dist}px;
+      --ty: ${Math.sin(angle)*dist}px;
+      animation: particle-burst ${0.5 + Math.random()*0.5}s ease forwards;
+    `;
+    screen.appendChild(p);
+    setTimeout(() => p.remove(), 1000);
+  }
+}
+
+function massParticles() {
+  const screen = document.getElementById('heart-screen');
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'heart-particle';
+    p.textContent = ['❤️','💕','💗','💓','💖','🌸','✨','💫','🌺'][Math.floor(Math.random()*9)];
+    const angle = (i / 40) * Math.PI * 2;
+    const dist = 100 + Math.random() * 300;
+    const dur = 0.4 + Math.random() * 0.8;
+    p.style.cssText = `
+      left: ${cx}px; top: ${cy}px;
+      font-size: ${12 + Math.random()*24}px;
+      --tx: ${Math.cos(angle)*dist}px;
+      --ty: ${Math.sin(angle)*dist}px;
+      animation: particle-burst ${dur}s ease forwards;
+      animation-delay: ${Math.random()*0.2}s;
+    `;
+    screen.appendChild(p);
+    setTimeout(() => p.remove(), 1200);
+  }
+}
+
+/* ════════════════════
+   REASONS
+════════════════════ */
+const reasons = [
+  { icon: '😊', text: 'The way you talk about your day - it makes my day better' },
+  { icon: '🩺', text: 'You chose to help people for a living, there is something unique and beautiful about person whose purpose is kindness' },
+  { icon: '🌙', text: 'Even after a long day in the university, you still find energy and time to be with me , i really appreciate it' },
+  { icon: '😂', text: 'Your laugh, not that polite one,but real geniune laugh when you cant hold yourself, thats what makes me want to be funny forever' },
+  { icon: '🧠', text: 'You are so smart , you dont fully realize it, but listening to you,is so catchy and interesting ' },
+  { icon: '🤝', text: 'The way you treat people, even if they have bad behaviour you still treat them as everyone , and find good in bad' },
+  { icon: '🌸', text: 'You make ordinary moments feel <strong>special</strong>. A regular Tuesday with you is better than most people\'s best days.' },
+  { icon: '💪', text: 'You are quietly strong, i know you carry a lot, and you do it with grace' },
+  { icon: '✨', text: 'You are geniunely curious about everything, and ask real questions and actually listen to them ' },
+  { icon: '🏠', text: 'Being around you feels like a home, not ordinary home, but comfortable, warm, and loving' },
+  { icon: '🎯', text: 'It feels like i have known you all my life, this bond really makes me happy' },
+  { icon: '💬', text: 'The way you listen, you really interested about what im talking about, even if you dont understand, but i like explaining it to you' },
+  { icon: '🌹', text: 'You always know what to say when im feeling bad' },
+  { icon: '💙', text: 'You inspire me to be the best version of myself, not because you demand it, but being around makes me be better' },
+];
+
+function showReasons() {
+  const hs = document.getElementById('heart-screen');
+  hs.style.transition = 'opacity 0.5s';
+  hs.style.opacity = '0';
+  setTimeout(() => {
+    hs.style.display = 'none';
+    hs.classList.remove('active');
+
+    const rs = document.getElementById('reasons-screen');
+    rs.style.display = 'flex';
+    rs.style.opacity = '0';
+    rs.classList.add('active');
+    requestAnimationFrame(() => {
+      rs.style.transition = 'opacity 0.8s';
+      rs.style.opacity = '1';
+    });
+
+    buildReasons();
+    startFloatingHearts();
+  }, 500);
+}
+
+function buildReasons() {
+  const grid = document.getElementById('reasons-grid');
+  reasons.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'reason-card';
+    card.innerHTML = `
+      <div class="reason-num">${String(i+1).padStart(2,'0')} / 14  ${r.icon}</div>
+      <div class="reason-text">${r.text}</div>
+    `;
+    grid.appendChild(card);
+    setTimeout(() => card.classList.add('visible'), 200 + i * 120);
+  });
+}
+
+function startFloatingHearts() {
+  const container = document.getElementById('float-hearts');
+  const emojis = ['❤️','💕','💗','💓','💖','🌸','✨','💫'];
+  setInterval(() => {
+    const fh = document.createElement('div');
+    fh.className = 'fh';
+    fh.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    fh.style.left = Math.random()*100 + 'vw';
+    fh.style.animationDuration = (8 + Math.random()*8) + 's';
+    fh.style.fontSize = (16 + Math.random()*20) + 'px';
+    container.appendChild(fh);
+    setTimeout(() => fh.remove(), 16000);
+  }, 700);
+}
+</script>
+</body>
+</html>
